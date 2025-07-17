@@ -32,7 +32,7 @@ export const HyperButton = ({
   disabled = false,
 }: HyperButtonProps) => {
   const id = useId();
-  const { sfxTech: fx } = useSFX({ playbackRate: 1.15, volume: 0.03 });
+  const { sfxDarbuka: fx } = useSFX({ playbackRate: 1.15, volume: 0.2 });
   const handleClick = useCallback(() => {
     fx();
     if (fn) fn();

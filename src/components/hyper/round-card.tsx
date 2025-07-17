@@ -1,4 +1,4 @@
-import { User } from "@/app/lobby/chat/types";
+import { User } from "@/components/chat/types";
 import { Icon } from "@/lib/icons";
 import { useCallback } from "react";
 
@@ -12,25 +12,18 @@ export const RoundCard = ({ name, id, fn }: ChatHead) => {
   return (
     <button
       onClick={handleLogin}
-      className="w-full max-w-sm aspect-square rounded-full border-2 m-1 h-fit size-full border-chalk/40 shadow-inner bg-radial-[at_0%_60%] overflow-hidden dark:from-slate-200 dark:via-slate-300/80 dark:to-slate-100 px-8 pt-10 pb-7"
+      className="w-full md:max-w-sm aspect-square rounded-full md:m-1 size-24 md:size-40 bg-neutral-100 p-4 md:px-8 md:pt-10 md:pb-7"
     >
       <div className="w-full flex items-start justify-start size-full">
-        <div className="mb-10 w-full flex flex-col">
-          <p className="text-xs font-normal uppercase tracking-wider text-muted-foreground dark:text-slate-700">
-            {id}
-          </p>
-          <h2 className="mt-2 text-2xl font-bold font-ox tracking-tighter text-foreground dark:text-slate-800">
-            {name}
-          </h2>
-        </div>
-        <div className="flex-1 relative">
-          <span className="cursor-pointer rounded-full hover:bg-origin relative -top-4 -right-3 p-1">
+        <div className="w-full flex flex-col">
+          <h2 className="md:space-y-2 space-y-2 flex flex-col items-center text-base md:text-2xl font-semibold font-ox tracking-tighter text-foreground dark:text-neutral-700">
             <Icon
               solid
-              name="px-arrow-up"
-              className="size-7 shrink-0 rotate-45 dark:text-lime-200 text-red-200"
+              name="ninja-head"
+              className="md:size-10 size-6 shrink-0 text-neutral-400"
             />
-          </span>
+            <span className="font-normal font-mono text-sm">{name}</span>
+          </h2>
         </div>
       </div>
     </button>

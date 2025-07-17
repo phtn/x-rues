@@ -1,0 +1,34 @@
+{
+  "rooms": [
+    {
+      "id": "room-1752648053645",
+      "name": "JJJ",
+      "members": [
+        {
+          "id": "alice",
+          "name": "Alice",
+          "public_key": "M4+oeAqetP8yNJwHwsaS5bWf80Xi6NHvvzt9aesmNlw=",
+          "private_key": "JRGwwBBZNt58FNNpBhC7ZHq/OcWrIri4csuUwkvpdkY="
+        }
+      ],
+      "createdAt": "2025-07-16T06:40:53.645Z",
+      "creatorId": "alice"
+    },
+    {
+      "id": "room-1752781317847",
+      "name": "Chevy Runes",
+      "members": [
+        {
+          "id": "charlie",
+          "name": "Charlie",
+          "public_key": "OFfzgVHq7ApGh1B5Xjf+uXawDu/aOo9xwTKkmdOnLk0=",
+          "private_key": "aMku0nxzhtPYrYCLjg1s5Gb5tagR8g7Wn0T52JUqb1c="
+        }
+      ],
+      "createdAt": "2025-07-17T19:41:57.847Z",
+      "creatorId": "charlie"
+    }
+  ],
+  "messages": [],
+  "permissions": []
+}

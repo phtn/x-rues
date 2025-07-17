@@ -1,4 +1,4 @@
-import { usePermissionsCtx } from "@/ctx/permissions";
+import { usePermissionsCtx } from "@/ctx/permissions-ctx";
 import { User } from "./types";
 
 interface Props {

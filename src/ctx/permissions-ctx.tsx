@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@/app/lobby/chat/types";
+import { User } from "@/components/chat/types";
 import { useChatRoom } from "@/hooks/use-chatroom";
 import {
   createContext,

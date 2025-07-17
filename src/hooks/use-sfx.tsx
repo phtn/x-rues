@@ -36,7 +36,7 @@ export const useSFX = ({
   soundEnabled,
 }: HookOptions) => {
   const opts = {
-    volume: volume ?? 0.35,
+    volume: volume ?? 0.25,
     interrupt: interrupt ?? true,
     playbackRate: playbackRate ?? 0.5,
     soundEnabled: soundEnabled ?? true,

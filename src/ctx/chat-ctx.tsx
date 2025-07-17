@@ -1,9 +1,10 @@
 "use client";
 
-import { Ver } from "@/app/lobby/chat/image-message";
-import { ApiRoom, Message, User } from "@/app/lobby/chat/types";
+import { Ver } from "@/components/chat/image-message";
+import { ApiRoom, Message, User } from "@/components/chat/types";
 import { useChatRoom } from "@/hooks/use-chatroom";
 import { handleAsync } from "@/utils/async-handler";
+import { usePathname } from "next/navigation";
 import {
   createContext,
   useCallback,
@@ -26,8 +27,8 @@ interface ChatCtxValues {
   setActiveRoom: Dispatch<SetStateAction<string | null>>;
   isLoading: boolean;
   error: Error | null;
-  loginUser: (userId: string) => void;
-  createRoom: () => Promise<void>;
+  loginUser: (userId: string) => Promise<void>;
+  createRoom: () => Promise<string | null>;
   joinRoom: (roomId: string) => Promise<void>;
   deleteRoom: (roomId: string) => Promise<void>;
   decryptMessage: (message: Message | Ver) => Promise<string>;
@@ -43,14 +44,7 @@ interface ChatCtxValues {
 const ChatCtx = createContext<ChatCtxValues | null>(null);
 
 const ChatCtxProvider = ({ children }: ChatProviderProps) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [activeRoom, setActiveRoom] = useState<string | null>(null);
-
-  const [newMessage, setNewMessage] = useState("");
-  const [newRoomName, setNewRoomName] = useState("");
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const pathname = usePathname();
   const {
     chatRooms,
     ruesApiCall,
@@ -58,6 +52,16 @@ const ChatCtxProvider = ({ children }: ChatProviderProps) => {
     loadRoomsAndMessages,
     MOCK_USERS,
   } = useChatRoom();
+  const userId = pathname.split("/")[1];
+  const currentUsr = MOCK_USERS.find((e) => e.id === userId) ?? null;
+  const [currentUser, setCurrentUser] = useState<User | null>(currentUsr);
+  const [activeRoom, setActiveRoom] = useState<string | null>(null);
+
+  const [newMessage, setNewMessage] = useState("");
+  const [newRoomName, setNewRoomName] = useState("");
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   const loginUser = useCallback(
     async (userId: string) => {
@@ -195,27 +199,35 @@ const ChatCtxProvider = ({ children }: ChatProviderProps) => {
   );
 
   // Create new chat room
-  const createRoom = useCallback(async () => {
-    if (!newRoomName.trim() || !currentUser) return;
+  const createRoom = useCallback(async (): Promise<string | null> => {
+    if (!newRoomName.trim() || !currentUser) return null;
 
     setIsLoading(true);
     setError(null);
 
-    const { room } = (
-      await handleAsync(roomsApiCall)("CREATE_ROOM", {
-        name: newRoomName,
-        creator: currentUser,
-      })
-    ).data as { room: ApiRoom };
+    try {
+      const { room } = (
+        await handleAsync(roomsApiCall)("CREATE_ROOM", {
+          name: newRoomName,
+          creator: currentUser,
+        })
+      ).data as { room: ApiRoom };
 
-    if (room) {
-      setNewRoomName("");
-      setActiveRoom(room.id);
-      loadRoomsAndMessages();
-    } else {
-      setError(new Error("Failed to create room"));
+      if (room) {
+        setNewRoomName("");
+        setActiveRoom(room.id);
+        loadRoomsAndMessages();
+        return room.id;
+      } else {
+        setError(new Error("Failed to create room"));
+        return null;
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e : new Error("Failed to create room"));
+      return null;
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, [
     currentUser,
     loadRoomsAndMessages,

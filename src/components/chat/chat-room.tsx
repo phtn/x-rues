@@ -1,14 +1,12 @@
 "use client";
 
-import { HyperList } from "@/components/hyper";
-import { RoundCard } from "@/components/hyper/round-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useChatCtx } from "@/ctx/chat-ctx";
 import { usePermissionsCtx } from "@/ctx/permissions-ctx";
 import { useChatRoom } from "@/hooks/use-chatroom";
 import { Icon } from "@/lib/icons";
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef } from "react";
+import { type ChangeEvent, useCallback, useEffect, useRef } from "react";
 import { ImageUpload } from "./image-upload";
 import { MessageBubble } from "./message-bubble";
 import { PermissionsModal } from "./permissions";
@@ -18,7 +16,6 @@ export const ChatRoom = () => {
 
   const {
     currentUser,
-    loginUser,
     joinRoom,
     isLoading,
     error,
@@ -32,9 +29,10 @@ export const ChatRoom = () => {
     setNewRoomName,
     onLogout,
     decryptMessage,
+    activeRoom,
   } = useChatCtx();
 
-  const { chatRooms, loadRoomsAndMessages, MOCK_USERS } = useChatRoom();
+  const { chatRooms, loadRoomsAndMessages } = useChatRoom();
 
   const { withPermission, selectedUser, onUserSelect, showPermissionsModal } =
     usePermissionsCtx();
@@ -58,17 +56,6 @@ export const ChatRoom = () => {
 
   const activeRoomData = chatRooms.find((r) => r.id === activeRoom);
 
-  const data = useMemo(() => {
-    const allUsers = MOCK_USERS.map((e) => ({
-      ...e,
-      fn: loginUser,
-    }));
-    if (currentUser) {
-      return allUsers.filter((user) => user.id !== currentUser.id);
-    }
-    return allUsers;
-  }, [MOCK_USERS, loginUser, currentUser]);
-
   const handleJoinRoom = useCallback(
     (id: string) => () => joinRoom(id),
     [joinRoom],
@@ -88,44 +75,13 @@ export const ChatRoom = () => {
     [setNewRoomName],
   );
 
-  // Login screen
-  if (!currentUser) {
-    return (
-      <div className="relative z-20">
-        <h2 className="font-sans text-center h-20 text-2xl tracking-tighter">
-          Select your Avatar
-        </h2>
-        <div className="flex justify-evenly gap-8">
-          <HyperList
-            container="flex gap-10 p-4"
-            direction="right"
-            data={data}
-            component={RoundCard}
-          />
-        </div>
-        {isLoading && (
-          <p
-            style={{ textAlign: "center", marginTop: "16px", color: "#cbd5e1" }}
-          >
-            Generating keypair...
-          </p>
-        )}
-        {error && (
-          <p className="text-orange-300 text-center text-lg h-12">
-            {error.message}
-          </p>
-        )}
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-7xl mx-auto rounded-sm bg-slate-300/20 overflow-hidden">
       {/* Header */}
       <div className="bg-slate-300/10 p-3 flex justify-between items-center">
         <div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: "bold", margin: 0 }}>
-            Hi, {currentUser.name}!
+            Hi, {currentUser?.name}!
           </h2>
           {/* <p
             style={{ fontSize: "0.875rem", opacity: 0.75, margin: "4px 0 0 0" }}
@@ -229,7 +185,7 @@ export const ChatRoom = () => {
                   Members:
                   {activeRoomData.members.map((member, index) => (
                     <span key={member.id}>
-                      {member.id === currentUser.id ? (
+                      {member.id === currentUser?.id ? (
                         <span
                           className="bg-pink-400"
                           style={{ color: "#60a5fa" }}
@@ -265,9 +221,9 @@ export const ChatRoom = () => {
                   <MessageBubble
                     key={message.id}
                     message={message}
-                    currentUserId={currentUser.id}
+                    currentUserId={currentUser?.id as string}
                     decryptMessage={decryptMessage}
-                    isOwn={message.senderId === currentUser.id}
+                    isOwn={message.senderId === currentUser?.id}
                   />
                 ))}
                 <div ref={messagesEndRef} />

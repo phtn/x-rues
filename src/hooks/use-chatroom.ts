@@ -5,8 +5,8 @@ import type {
   CryptoApiRequest,
   IChatRoom,
   RoomApiData,
-} from "@/app/lobby/chat/types";
-import { type ChatHead } from "@/components/hyper/round-card";
+  User,
+} from "@/components/chat/types";
 import { handleAsync } from "@/utils/async-handler";
 import { useCallback, useState } from "react";
 
@@ -33,7 +33,7 @@ export const useChatRoom = () => {
       public_key: "VDxY6AmpB1kWVhVLbcbz6umfIFZHcuYA4u5dfzZ8WxU=",
       private_key: "o0UjKydZLiniAaiWYg5e2wudFm80SGWWp/6fBEYIkM4=",
     },
-  ] as ChatHead[];
+  ] as User[];
 
   // Get all rooms and messages
   const getRoomsAndMessages = useCallback(async (): Promise<{
