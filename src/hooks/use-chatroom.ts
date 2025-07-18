@@ -3,15 +3,12 @@ import type {
   ApiPermission,
   ApiRoom,
   CryptoApiRequest,
-  IChatRoom,
   RoomApiData,
   User,
 } from "@/components/chat/types";
-import { handleAsync } from "@/utils/async-handler";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
 export const useChatRoom = () => {
-  const [chatRooms, setChatRooms] = useState<IChatRoom[]>([]);
   // Mock users for demo
   //
   const MOCK_USERS = [
@@ -48,32 +45,6 @@ export const useChatRoom = () => {
     return response.json();
   }, []);
 
-  const loadRoomsAndMessages = useCallback(async () => {
-    const results = (await handleAsync(getRoomsAndMessages)()).data as {
-      rooms: ApiRoom[];
-      messages: ApiMessage[];
-      permissions: ApiPermission[];
-    };
-
-    if (results) {
-      const { rooms, messages, permissions } = results;
-      // Convert to ChatRoom format with messages and permissions
-      const roomsWithMessages = rooms.map((room) => ({
-        ...room,
-        createdAt: new Date(room.createdAt),
-        messages: messages
-          .filter((msg) => msg.roomId === room.id)
-          .map((msg) => ({
-            ...msg,
-            timestamp: new Date(msg.timestamp),
-          })),
-        permissions: permissions.filter((p) => p.roomId === room.id),
-      }));
-      setChatRooms(roomsWithMessages);
-    } else {
-      console.error("Failed to load rooms");
-    }
-  }, [getRoomsAndMessages]);
   // API helpers
   const ruesApiCall = useCallback(
     async <T>(
@@ -115,11 +86,9 @@ export const useChatRoom = () => {
   );
 
   return {
-    chatRooms,
     ruesApiCall,
     roomsApiCall,
     getRoomsAndMessages,
-    loadRoomsAndMessages,
     MOCK_USERS,
   };
 };

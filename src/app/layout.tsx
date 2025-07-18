@@ -7,6 +7,8 @@ import {
   Special_Elite,
 } from "next/font/google";
 import "./globals.css";
+import { ProviderCtxProvider } from "@/ctx";
+import { ReactNode } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,14 +43,14 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${se.variable} ${space.variable} ${ox.variable} ${geistSans.variable} ${geistMono.variable} antialiased font-sans`}
       >
-        {children}
+        <ProviderCtxProvider>{children}</ProviderCtxProvider>
       </body>
     </html>
   );

@@ -3,15 +3,31 @@
 import { useSFX } from "@/hooks/use-sfx";
 import { Icon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
+import { handleAsync } from "@/utils/async-handler";
 import { motion } from "motion/react";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { getCookie, setCookie } from "./actions";
 
 interface Props {
   mappedSeq: Record<number, number>;
 }
 export const Content = ({ mappedSeq }: Props) => {
   const { sfxDarbuka: sfx } = useSFX({ interrupt: true, volume: 0.15 });
+
+  const { setTheme } = useTheme();
+
+  useEffect(() => {
+    handleAsync(getCookie)("theme")
+      .then((v) => {
+        if (!v) {
+        }
+        setTheme("dark");
+        handleAsync(setCookie)("theme", "dark").catch(console.error);
+      })
+      .catch(console.error);
+  }, [setTheme]);
 
   const [seq, setSeq] = useState<number[]>([]);
 

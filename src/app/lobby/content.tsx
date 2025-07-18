@@ -2,7 +2,7 @@
 
 import { RoundCard } from "@/components/hyper/round-card";
 import { useChatRoom } from "@/hooks/use-chatroom";
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { useChatCtx } from "@/ctx/chat-ctx";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,11 @@ import { Icon } from "@/lib/icons";
 
 export const Content = () => {
   const { isLoading, currentUser, loginUser, error } = useChatCtx();
+
+  useEffect(() => {
+    if (currentUser) console.table(currentUser);
+  }, [currentUser]);
+
   const { MOCK_USERS } = useChatRoom();
   const router = useRouter();
 
@@ -19,7 +24,6 @@ export const Content = () => {
 
   const handleAvatarSelect = useCallback(
     async (userId: string) => {
-      console.log(userId);
       setSelectedAvatar(userId);
 
       // Wait for the transition animation to complete before starting login
@@ -34,6 +38,7 @@ export const Content = () => {
           setTimeout(() => {
             // Set userId in cookie (this will be used by middleware)
             document.cookie = `userId=${userId}; path=/; max-age=86400; SameSite=Strict`;
+            // Navigate directly to the user-specific rooms page instead of relying on middleware
             router.push(`/lobby/${userId}/rooms`);
           }, 1500);
         } catch (error) {
@@ -48,8 +53,8 @@ export const Content = () => {
   );
 
   const data = useMemo(() => {
-    const allUsers = MOCK_USERS.map((e) => ({
-      ...e,
+    const allUsers = MOCK_USERS.map((u) => ({
+      ...u,
       fn: handleAvatarSelect,
     }));
     if (currentUser) {

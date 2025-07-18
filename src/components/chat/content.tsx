@@ -1,12 +1,15 @@
 "use client";
 
 import { PermissionsCtxProvider } from "@/ctx/permissions-ctx";
+import { ChatCtxProvider } from "@/ctx/chat-ctx";
 import { ChatRoom } from "./chat-room";
 
 export const Content = () => {
   return (
-    <PermissionsCtxProvider>
-      <ChatRoom />
-    </PermissionsCtxProvider>
+    <ChatCtxProvider>
+      <PermissionsCtxProvider>
+        <ChatRoom />
+      </PermissionsCtxProvider>
+    </ChatCtxProvider>
   );
 };

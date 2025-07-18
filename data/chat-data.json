@@ -1,32 +1,24 @@
 {
   "rooms": [
     {
-      "id": "room-1752648053645",
-      "name": "JJJ",
+      "id": "room-1752815153011",
+      "name": " Epstein Files",
       "members": [
         {
           "id": "alice",
           "name": "Alice",
-          "public_key": "M4+oeAqetP8yNJwHwsaS5bWf80Xi6NHvvzt9aesmNlw=",
-          "private_key": "JRGwwBBZNt58FNNpBhC7ZHq/OcWrIri4csuUwkvpdkY="
-        }
-      ],
-      "createdAt": "2025-07-16T06:40:53.645Z",
-      "creatorId": "alice"
-    },
-    {
-      "id": "room-1752781317847",
-      "name": "Chevy Runes",
-      "members": [
+          "private_key": "GGVaJdkJrjdDfnhYn8Qz/7SRiPJyM1AhDnloD+/NW1U=",
+          "public_key": "MGd7crTwqRLABZkdl9WND1PIEmTqirw41xS3KBsYBl4="
+        },
         {
           "id": "charlie",
           "name": "Charlie",
-          "public_key": "OFfzgVHq7ApGh1B5Xjf+uXawDu/aOo9xwTKkmdOnLk0=",
-          "private_key": "aMku0nxzhtPYrYCLjg1s5Gb5tagR8g7Wn0T52JUqb1c="
+          "private_key": "5XAshpwcRJgxE54FQE/D1dx4hk7ot5l3iUiK4qV/24k=",
+          "public_key": "6jsogDbyJU1tB+YCrXdyHrSIRGjbdyAk3TVjCRRKlVA="
         }
       ],
-      "createdAt": "2025-07-17T19:41:57.847Z",
-      "creatorId": "charlie"
+      "createdAt": "2025-07-18T05:05:53.011Z",
+      "creatorId": "alice"
     }
   ],
   "messages": [],

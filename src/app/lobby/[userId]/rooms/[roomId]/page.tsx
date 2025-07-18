@@ -21,19 +21,5 @@ export default async function RoomPage({ params }: RoomPageProps) {
     return notFound();
   }
 
-  return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Room: {roomId}</h1>
-      <div className="bg-neutral-100 rounded-lg p-6">
-        <p className="text-gray-700">
-          You are viewing room {roomId} as user {userId}
-        </p>
-        <p className="text-sm text-gray-500 mt-2">
-          Note: The userId is hidden from the URL in the browser address bar
-        </p>
-      </div>
-
-      <Content roomId={roomId} userId={userId} />
-    </div>
-  );
+  return <Content roomId={roomId} userId={userId} />;
 }

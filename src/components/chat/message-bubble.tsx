@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, memo } from "react";
-import { Message } from "./types";
-import { ImageMessage, Ver } from "./image-message";
+import { memo, useEffect, useState } from "react";
+import { ImageMessage, type Ver } from "./image-message";
+import { type Message } from "./types";
 
-interface MessageBubbleProps {
+export interface ChatBubbleProps {
   message: Message;
   isOwn: boolean;
   decryptMessage: (message: Message | Ver) => Promise<string>;
@@ -12,8 +12,8 @@ interface MessageBubbleProps {
 }
 
 // Message bubble component - memoized to prevent unnecessary re-renders
-const MessageBubble = memo(
-  ({ message, isOwn, decryptMessage, currentUserId }: MessageBubbleProps) => {
+const ChatBubble = memo(
+  ({ message, isOwn, decryptMessage, currentUserId }: ChatBubbleProps) => {
     const [decryptedContent, setDecryptedContent] = useState<string>("");
     const [isDecrypting, setIsDecrypting] = useState(false);
     const [hasDecrypted, setHasDecrypted] = useState(false);
@@ -116,45 +116,46 @@ const MessageBubble = memo(
           justifyContent: isOwn ? "flex-end" : "flex-start",
         }}
       >
-        <div
-          style={{
-            maxWidth: "300px",
-            padding: "8px 16px",
-            borderRadius: "8px",
-            backgroundColor: isOwn ? "#3b82f6" : "#475569",
-            color: isOwn ? "white" : "#f1f5f9",
-          }}
-        >
-          {!isOwn && (
+        <div className="chat-bubble min-h-36">
+          <div
+            style={{
+              maxWidth: "300px",
+              padding: "8px 16px",
+              backgroundColor: isOwn ? "#3b82f6" : "#475569",
+              color: isOwn ? "white" : "#f1f5f9",
+            }}
+          >
+            {!isOwn && (
+              <div
+                style={{
+                  fontSize: "0.75rem",
+                  fontWeight: "500",
+                  marginBottom: "4px",
+                  opacity: 0.75,
+                }}
+              >
+                {message.senderName}
+              </div>
+            )}
+            <div>
+              {isDecrypting ? (
+                <span style={{ fontStyle: "italic", opacity: 0.75 }}>
+                  Decrypting...
+                </span>
+              ) : (
+                displayContent
+              )}
+            </div>
             <div
               style={{
                 fontSize: "0.75rem",
-                fontWeight: "500",
-                marginBottom: "4px",
-                opacity: 0.75,
+                marginTop: "4px",
+                color: isOwn ? "#dbeafe" : "#6b7280",
               }}
             >
-              {message.senderName}
+              {message.timestamp.toLocaleTimeString()}
+              {!isOwn && <span style={{ marginLeft: "8px" }}>🔓</span>}
             </div>
-          )}
-          <div>
-            {isDecrypting ? (
-              <span style={{ fontStyle: "italic", opacity: 0.75 }}>
-                Decrypting...
-              </span>
-            ) : (
-              displayContent
-            )}
-          </div>
-          <div
-            style={{
-              fontSize: "0.75rem",
-              marginTop: "4px",
-              color: isOwn ? "#dbeafe" : "#6b7280",
-            }}
-          >
-            {message.timestamp.toLocaleTimeString()}
-            {!isOwn && <span style={{ marginLeft: "8px" }}>🔓</span>}
           </div>
         </div>
       </div>
@@ -162,6 +163,6 @@ const MessageBubble = memo(
   },
 );
 
-MessageBubble.displayName = "MessageBubble";
+ChatBubble.displayName = "ChatBubble";
 
-export { MessageBubble };
+export { ChatBubble };

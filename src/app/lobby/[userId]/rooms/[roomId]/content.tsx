@@ -1,8 +1,6 @@
 "use client";
 
-import { PermissionsCtxProvider } from "@/ctx/permissions-ctx";
-import { ChatCtxProvider } from "@/ctx/chat-ctx";
-import { ChatRoom } from "@/components/chat/room/chat-room";
+import { Room } from "@/components/chat/room";
 
 interface ContentProps {
   roomId: string;
@@ -10,11 +8,5 @@ interface ContentProps {
 }
 
 export const Content = ({ roomId, userId }: ContentProps) => {
-  return (
-    <ChatCtxProvider>
-      <PermissionsCtxProvider>
-        <ChatRoom roomId={roomId} userId={userId} />
-      </PermissionsCtxProvider>
-    </ChatCtxProvider>
-  );
+  return <Room roomId={roomId} userId={userId} />;
 };

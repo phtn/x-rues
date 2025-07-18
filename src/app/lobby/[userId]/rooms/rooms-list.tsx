@@ -1,5 +1,6 @@
 "use client";
 
+import { User } from "@/components/chat/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useChatCtx } from "@/ctx/chat-ctx";
@@ -25,19 +26,21 @@ export default function RoomsList({ userId }: RoomsListProps) {
     setNewRoomName,
     createRoom,
     onLogout,
+    chatRooms,
+    loadRoomsAndMessages,
   } = useChatCtx();
 
-  const { chatRooms, loadRoomsAndMessages } = useChatRoom();
+  const {} = useChatRoom();
 
   // Load rooms when user is authenticated
   useEffect(() => {
     if (currentUser) {
-      loadRoomsAndMessages();
+      loadRoomsAndMessages(userId);
       // Poll for updates every 3 seconds
       const interval = setInterval(loadRoomsAndMessages, 3000);
       return () => clearInterval(interval);
     }
-  }, [currentUser, loadRoomsAndMessages]);
+  }, [currentUser, loadRoomsAndMessages, userId]);
 
   // Redirect to lobby if not authenticated
   useEffect(() => {
@@ -56,19 +59,22 @@ export default function RoomsList({ userId }: RoomsListProps) {
   const handleCreateRoom = useCallback(async () => {
     const roomId = await createRoom();
     if (roomId) {
-      // Navigate to the newly created room using the public URL format
-      // The middleware will handle the rewriting internally
+      // Navigate directly to the user-specific room page
       router.push(`/lobby/${userId}/rooms/${roomId}`);
     }
   }, [createRoom, router, userId]);
 
   const handleJoinRoom = useCallback(
     (roomId: string) => () => {
-      // Navigate to the room using the public URL format
-      // The middleware will handle the rewriting internally
+      // Navigate directly to the user-specific room page
       router.push(`/lobby/${userId}/rooms/${roomId}`);
     },
     [router, userId],
+  );
+
+  const notSelf = useCallback(
+    (user: User) => currentUser && user.id !== currentUser.id,
+    [currentUser],
   );
 
   if (!currentUser) {
@@ -81,13 +87,13 @@ export default function RoomsList({ userId }: RoomsListProps) {
 
   return (
     <div className="min-h-screen w-screen flex items-start justify-center bg-gradient-to-br from-background to-muted/20">
-      <div className="px-4 py-8 border-2 rounded-[2.5rem] w-5xl mt-28">
-        <div className="max-w-4xl mx-auto p-6 space-y-20">
+      <div className="px-4 py-8 border-2 dark:border-accent rounded-[2.5rem] w-5xl mt-28">
+        <div className="mx-auto p-6 space-y-20">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex justify-between items-center mb-12 pt-8 pb-3 border-b-2 border-border/60"
+            className="flex justify-between items-center mb-12 pt-8 pb-3 border-b-2 border-border"
           >
             <div>
               <h1 className="text-2xl font-medium tracking-tight font-ox">
@@ -122,14 +128,14 @@ export default function RoomsList({ userId }: RoomsListProps) {
             </h2>
 
             {chatRooms.length === 0 ? (
-              <div className="text-center py-12 bg-card rounded-lg border">
+              <div className="text-center py-16 bg-accent rounded-lg border">
                 <Icon
                   solid
-                  name="px-chat"
-                  className="size-12 mx-auto text-muted-foreground mb-4"
+                  name="spinners-ring"
+                  className="size-6 mx-auto text-muted-foreground mb-4"
                 />
                 <p className="text-muted-foreground">
-                  No rooms available. Create your first room to get started!
+                  Secure linking in progress...
                 </p>
               </div>
             ) : (
@@ -143,15 +149,15 @@ export default function RoomsList({ userId }: RoomsListProps) {
                       exit={{ opacity: 0, scale: 0.2 }}
                       transition={{
                         type: "spring",
-                        visualDuration: 0.4,
-                        bounce: 0.6,
-                        delay: index * 0.05,
+                        visualDuration: 0.45,
+                        bounce: 0.5,
+                        delay: index * 0.15,
                       }}
-                      className="p-6 md:p-2 bg-neutral-800 rounded-lg border hover:shadow-md cursor-pointer group"
+                      className="p-6 md:p-3 md:pb-1 bg-card rounded-lg border hover:shadow-md cursor-pointer group"
                       onClick={handleJoinRoom(room.id)}
                     >
                       <div className="flex justify-between items-start relative">
-                        <div className="p-4 flex-1 space-y-4">
+                        <div className="p-2 flex-1 space-y-6">
                           <h3 className="text-lg font-se font-semibold text-neutral-200">
                             {room.name}
                           </h3>
@@ -169,7 +175,7 @@ export default function RoomsList({ userId }: RoomsListProps) {
                           {/* Members preview */}
                           <div className="mt-6 w-full">
                             <div className="flex flex-wrap gap-1">
-                              {room.members.map((member) => (
+                              {room.members.filter(notSelf).map((member) => (
                                 <span
                                   key={member.id}
                                   className={`px-2 py-1 rounded-full text-xs ${
@@ -179,7 +185,7 @@ export default function RoomsList({ userId }: RoomsListProps) {
                                   }`}
                                 >
                                   {member.name.substring(0, 1)}
-                                  {member.id === currentUser.id && " (you)"}
+                                  {member.id !== currentUser.id}
                                 </span>
                               ))}
                             </div>
@@ -236,7 +242,7 @@ export default function RoomsList({ userId }: RoomsListProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="p-6 bg-neutral-100 rounded-lg border"
+            className="p-6 bg-accent rounded-lg border"
           >
             <h2 className="text-xl font-semibold mb-4">Create New Room</h2>
             <div className="flex gap-4">
@@ -246,7 +252,7 @@ export default function RoomsList({ userId }: RoomsListProps) {
                 onChange={handleRoomNameChange}
                 placeholder="Enter room name"
                 onKeyDown={(e) => e.key === "Enter" && handleCreateRoom()}
-                className="flex-1 shadow-none bg-white"
+                className="flex-1 shadow-none"
               />
               <Button
                 onClick={handleCreateRoom}

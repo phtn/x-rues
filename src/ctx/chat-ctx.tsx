@@ -1,10 +1,16 @@
 "use client";
 
 import { Ver } from "@/components/chat/image-message";
-import { ApiRoom, Message, User } from "@/components/chat/types";
+import {
+  ApiMessage,
+  ApiPermission,
+  ApiRoom,
+  IChatRoom,
+  Message,
+  User,
+} from "@/components/chat/types";
 import { useChatRoom } from "@/hooks/use-chatroom";
 import { handleAsync } from "@/utils/async-handler";
-import { usePathname } from "next/navigation";
 import {
   createContext,
   useCallback,
@@ -39,29 +45,29 @@ interface ChatCtxValues {
   setNewRoomName: Dispatch<SetStateAction<string>>;
   newRoomName: string;
   onLogout: VoidFunction;
+  loadRoomsAndMessages: (userId: string) => void;
+  chatRooms: IChatRoom[];
 }
 
 const ChatCtx = createContext<ChatCtxValues | null>(null);
 
 const ChatCtxProvider = ({ children }: ChatProviderProps) => {
-  const pathname = usePathname();
-  const {
-    chatRooms,
-    ruesApiCall,
-    roomsApiCall,
-    loadRoomsAndMessages,
-    MOCK_USERS,
-  } = useChatRoom();
-  const userId = pathname.split("/")[1];
-  const currentUsr = MOCK_USERS.find((e) => e.id === userId) ?? null;
-  const [currentUser, setCurrentUser] = useState<User | null>(currentUsr);
+  const { MOCK_USERS, ruesApiCall, roomsApiCall, getRoomsAndMessages } =
+    useChatRoom();
+  // const userId = pathname.split("/")[2];
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [activeRoom, setActiveRoom] = useState<string | null>(null);
 
-  const [newMessage, setNewMessage] = useState("");
+  const [chatRooms, setChatRooms] = useState<IChatRoom[]>([]);
   const [newRoomName, setNewRoomName] = useState("");
+  const [newMessage, setNewMessage] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+
+  // useEffect(() => {
+  //   if (userId) console.log(userId);
+  // }, [userId, currentUser]);
 
   const loginUser = useCallback(
     async (userId: string) => {
@@ -78,7 +84,8 @@ const ChatCtxProvider = ({ children }: ChatProviderProps) => {
         }>("/genkeyp");
 
         const user: User = {
-          ...mockUser,
+          id: mockUser.id,
+          name: mockUser.name,
           ...keypair,
         };
 
@@ -91,6 +98,33 @@ const ChatCtxProvider = ({ children }: ChatProviderProps) => {
     },
     [MOCK_USERS, ruesApiCall, setCurrentUser],
   );
+
+  const loadRoomsAndMessages = useCallback(async () => {
+    const results = (await handleAsync(getRoomsAndMessages)()).data as {
+      rooms: ApiRoom[];
+      messages: ApiMessage[];
+      permissions: ApiPermission[];
+    };
+
+    if (results) {
+      const { rooms, messages, permissions } = results;
+      // Convert to ChatRoom format with messages and permissions
+      const roomsWithMessages = rooms.map((room) => ({
+        ...room,
+        createdAt: new Date(room.createdAt),
+        messages: messages
+          .filter((msg) => msg.roomId === room.id)
+          .map((msg) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp),
+          })),
+        permissions: permissions.filter((p) => p.roomId === room.id),
+      }));
+      setChatRooms(roomsWithMessages);
+    } else {
+      console.error("Failed to load rooms");
+    }
+  }, [getRoomsAndMessages]);
 
   const sendMessage = useCallback(async () => {
     if (!newMessage.trim() || !currentUser || !activeRoom) return;
@@ -402,6 +436,8 @@ const ChatCtxProvider = ({ children }: ChatProviderProps) => {
       setNewRoomName,
       newRoomName,
       onLogout,
+      loadRoomsAndMessages,
+      chatRooms,
     }),
     [
       currentUser,
@@ -422,6 +458,8 @@ const ChatCtxProvider = ({ children }: ChatProviderProps) => {
       setNewRoomName,
       newRoomName,
       onLogout,
+      loadRoomsAndMessages,
+      chatRooms,
     ],
   );
   return <ChatCtx value={value}>{children}</ChatCtx>;

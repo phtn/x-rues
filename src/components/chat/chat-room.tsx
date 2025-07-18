@@ -4,11 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useChatCtx } from "@/ctx/chat-ctx";
 import { usePermissionsCtx } from "@/ctx/permissions-ctx";
-import { useChatRoom } from "@/hooks/use-chatroom";
 import { Icon } from "@/lib/icons";
 import { type ChangeEvent, useCallback, useEffect, useRef } from "react";
 import { ImageUpload } from "./image-upload";
-import { MessageBubble } from "./message-bubble";
+import { ChatBubble } from "./message-bubble";
 import { PermissionsModal } from "./permissions";
 
 export const ChatRoom = () => {
@@ -30,9 +29,9 @@ export const ChatRoom = () => {
     onLogout,
     decryptMessage,
     activeRoom,
+    chatRooms,
+    loadRoomsAndMessages,
   } = useChatCtx();
-
-  const { chatRooms, loadRoomsAndMessages } = useChatRoom();
 
   const { withPermission, selectedUser, onUserSelect, showPermissionsModal } =
     usePermissionsCtx();
@@ -45,7 +44,7 @@ export const ChatRoom = () => {
   // Load rooms and messages when user logs in
   useEffect(() => {
     if (currentUser) {
-      loadRoomsAndMessages();
+      loadRoomsAndMessages(currentUser.id);
       // Poll for updates every 2 seconds
       const interval = setInterval(loadRoomsAndMessages, 2000);
       return () => clearInterval(interval);
@@ -54,7 +53,10 @@ export const ChatRoom = () => {
 
   // Initialize user with keypair
 
-  const activeRoomData = chatRooms.find((r) => r.id === activeRoom);
+  // Find active room data with null check
+  const activeRoomData = activeRoom
+    ? chatRooms.find((r) => r.id === activeRoom)
+    : undefined;
 
   const handleJoinRoom = useCallback(
     (id: string) => () => joinRoom(id),
@@ -218,7 +220,7 @@ export const ChatRoom = () => {
 
               <div className="flex flex-col h-full p-4 overflow-y-auto gap-3">
                 {activeRoomData.messages.map((message) => (
-                  <MessageBubble
+                  <ChatBubble
                     key={message.id}
                     message={message}
                     currentUserId={currentUser?.id as string}

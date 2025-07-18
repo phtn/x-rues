@@ -31,14 +31,14 @@ const PermissionsCtxProvider = ({ children }: PermissionsProviderProps) => {
   const [showPermissionsModal, setShowPermissionsModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const { currentUser, activeRoom } = useChatCtx();
+  const { currentUser, activeRoom, chatRooms } = useChatCtx();
 
   const handleCloseModal = useCallback(
     () => setShowPermissionsModal(false),
     [],
   );
 
-  const { roomsApiCall, chatRooms } = useChatRoom();
+  const { roomsApiCall } = useChatRoom();
 
   const setPermission = useCallback(
     (toUserId: string, allowed: boolean) => async () => {
