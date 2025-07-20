@@ -4,10 +4,10 @@ import { Icon } from "@/lib/icons";
 
 export function DesktopChatInput() {
   return (
-    <div className="flex items-center gap-5 rounded-xl border border-cyber-border bg-cyber-card p-3 shadow-lg shadow-cyber-blue/5 h-24">
+    <div className="flex items-center gap-5 rounded-t-xl rounded-b-sm border border-cyber-border bg-cyber-card p-3 shadow-lg shadow-cyber-blue/5 h-24">
       <Input
         placeholder="Your message"
-        className="flex-1 h-16 border-none bg-transparent text-base text-cyber-text-primary placeholder:text-cyber-text-secondary focus-visible:ring-0 focus-visible:ring-offset-0"
+        className="flex-1 h-16 border-none bg-transparent rounded-b-[6px] text-base text-cyber-text-primary placeholder:text-cyber-text-secondary focus-visible:ring-0 focus-visible:ring-offset-0"
       />
 
       <Button

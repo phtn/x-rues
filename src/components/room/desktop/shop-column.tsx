@@ -126,7 +126,7 @@ export function ShopColumn({ onClose }: ShopColumnProps) {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="h-20 flex items-center gap-4 rounded-xl bg-cyber-card p-4 border border-cyber-border hover:bg-cyber-card/80 transition-colors"
+                className="h-20 flex items-center gap-4 rounded-xl bg-card p-4 border border-cyber-panel hover:bg-cyber-card/80 transition-colors"
               >
                 <Icon solid name="px-link" className="size-6 text-teal-500" />
                 <div className="flex flex-col">

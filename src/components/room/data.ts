@@ -147,7 +147,7 @@ export const desktopChatList = [
     lastMessage: "I want to ask you to pick...",
     time: "4 m",
     unread: 5,
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "/imsages/re-up.png",
   },
   {
     id: "c2",
@@ -203,7 +203,7 @@ export const desktopChatList = [
     lastMessage: "Our company needs to prepare",
     time: "5 m",
     unread: 0,
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "/vercel.svg",
   },
 ];
 
@@ -211,7 +211,7 @@ export const desktopChatMessages = [
   {
     id: "dm1",
     senderId: "6",
-    content: "/placeholder.svg?height=200&width=300",
+    content: "/images/re-up.png",
     timestamp: "2023-07-28T10:00:00Z",
     type: "image",
   },

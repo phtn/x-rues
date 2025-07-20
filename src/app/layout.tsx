@@ -1,3 +1,4 @@
+import { ProviderCtxProvider } from "@/ctx";
 import type { Metadata } from "next";
 import {
   Geist,
@@ -6,9 +7,8 @@ import {
   Space_Grotesk,
   Special_Elite,
 } from "next/font/google";
+import { type ReactNode } from "react";
 import "./globals.css";
-import { ProviderCtxProvider } from "@/ctx";
-import { ReactNode } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

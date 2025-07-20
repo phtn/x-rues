@@ -73,7 +73,7 @@ export const MobileWindow = ({ selectedChatId }: ChatWindowProps) => {
             <ChatMessage
               key={message.id}
               message={message}
-              isCurrentUser={message.senderId === currentUser.id}
+              isCurrentUser={message.senderId === currentUser?.id}
             />
           ))}
         </div>

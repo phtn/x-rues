@@ -132,7 +132,7 @@ export const DesktopView = (props: Props) => {
 
       {/* Chat List Panel */}
       <div
-        className="relative flex flex-shrink-0 flex-col bg-cyber-panel p-6 transition-all duration-200 ease-in-out"
+        className="relative flex flex-shrink-0 flex-col bg-origin/5 p-6 transition-all duration-200 ease-in-out"
         style={{
           width: isChatListCollapsed ? COLLAPSED_WIDTH : chatListWidth,
         }}
@@ -176,7 +176,10 @@ export const DesktopView = (props: Props) => {
 
       {/* Main Chat Window */}
       <div className="flex flex-1 flex-col">
-        <DesktopWindow selectedChatId={selectedChatId} />
+        <DesktopWindow
+          isChatDetailsCollapsed={isChatDetailsCollapsed}
+          selectedChatId={selectedChatId}
+        />
       </div>
 
       {/* Resizer Handle 2 */}

@@ -43,7 +43,7 @@ export const DesktopMessage = ({
             className={cn(
               "max-w-md p-4 text-base",
               isCurrentUser
-                ? "rounded-t-lg rounded-bl-lg rounded-br bg-cyber-blue/30 text-cyber-text-primary border border-cyber-blue/50 shadow-md shadow-cyber-blue/10"
+                ? "rounded-t-lg rounded-bl-lg rounded-br bg-cyber-text-primary text-cyber-bg border border-cyber-panel shadow-md shadow-cyber-blue/10"
                 : "rounded-t-lg rounded-br-lg rounded-bl bg-cyber-card text-cyber-text-primary border border-cyber-border",
             )}
           >

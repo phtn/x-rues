@@ -59,14 +59,13 @@ export const Room = ({ roomId, userId }: RoomProps) => {
 
   // Load rooms and messages when user logs in
   useEffect(() => {
-    let counter = 0;
+    let interval = 0;
     if (currentUser) {
       loadRoomsAndMessages(userId);
       // Poll for updates every 2 seconds
-      const interval = setInterval(loadRoomsAndMessages, 2000);
-      console.log((counter += 1));
-      return () => clearInterval(interval);
+      interval = setInterval(loadRoomsAndMessages, 2000);
     }
+    return () => clearInterval(interval);
   }, [currentUser, loadRoomsAndMessages, userId]);
 
   // Redirect to lobby if not authenticated

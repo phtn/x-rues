@@ -13,10 +13,10 @@ export const DarkRoom = () => {
 
   // Set initial selected chat based on mode
   useEffect(() => {
-    if (isDesktop) {
+    if (isDesktop && users[5]) {
       setSelectedChatId(users[5].id); // Harry Fettel for desktop
     } else {
-      setSelectedChatId(users[2].id); // Marie Wondy for mobile
+      setSelectedChatId("2"); // Marie Wondy for mobile
     }
   }, [isDesktop]);
 

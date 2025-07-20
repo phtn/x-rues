@@ -5,7 +5,7 @@ import { ChevronRight, Bookmark } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function ChatListPanel() {
-  const currentUser = users[0]; // Pedrik Ronner
+  const currentUser = users[0]!; // Pedrik Ronner
   const topPeople = users.slice(1, 5); // Elena, Marie, Oskar, Nora
 
   return (

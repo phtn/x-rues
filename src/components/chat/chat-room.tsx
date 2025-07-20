@@ -43,12 +43,13 @@ export const ChatRoom = () => {
 
   // Load rooms and messages when user logs in
   useEffect(() => {
+    let interval = 0;
     if (currentUser) {
       loadRoomsAndMessages(currentUser.id);
       // Poll for updates every 2 seconds
-      const interval = setInterval(loadRoomsAndMessages, 2000);
-      return () => clearInterval(interval);
+      interval = setInterval(loadRoomsAndMessages, 2000);
     }
+    return () => clearInterval(interval);
   }, [currentUser, loadRoomsAndMessages]);
 
   // Initialize user with keypair

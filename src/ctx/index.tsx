@@ -2,6 +2,7 @@
 
 import { getCookie } from "@/app/actions";
 import { ThemeProvider } from "@/components/theme-provider";
+import { configureEffect } from "@/lib/effect/config";
 import { handleAsync } from "@/utils/async-handler";
 import {
   createContext,
@@ -12,6 +13,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { Toasts } from "./toast";
 
 interface ProviderProviderProps {
   children: ReactNode;
@@ -32,6 +34,11 @@ const ProviderCtxProvider = ({ children }: ProviderProviderProps) => {
   }, []);
 
   useEffect(() => {
+    configureEffect();
+    console.log("Effect in effect.");
+  }, []);
+
+  useEffect(() => {
     getTheme().catch(console.error);
   }, [getTheme]);
   const value = useMemo(
@@ -41,7 +48,7 @@ const ProviderCtxProvider = ({ children }: ProviderProviderProps) => {
     [],
   );
   return (
-    <ProviderCtx value={value}>
+    <ProviderCtx.Provider value={value}>
       <ThemeProvider
         enableSystem
         attribute="class"
@@ -50,7 +57,9 @@ const ProviderCtxProvider = ({ children }: ProviderProviderProps) => {
       >
         {children}
       </ThemeProvider>
-    </ProviderCtx>
+
+      <Toasts />
+    </ProviderCtx.Provider>
   );
 };
 

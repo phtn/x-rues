@@ -84,16 +84,17 @@ export function handleAsync<TArgs extends unknown[], TResult>(
               error: formatError(e),
             });
           }
+          return { error };
         }
 
         const isLastAttempt = attempt > retries;
 
         if (isLastAttempt) {
           if (rethrowInDev && process.env.NODE_ENV !== "production") {
-            throw error;
+            return { error: formatError(error) };
           }
 
-          return { error: formatError(error) };
+          return { error };
         }
       }
     }

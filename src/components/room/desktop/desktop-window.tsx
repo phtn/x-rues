@@ -3,12 +3,17 @@ import { DesktopMessage } from "./desktop-message";
 import { DesktopChatInput } from "./desktop-chat-input";
 import { users, desktopChatMessages } from "../data";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 interface DesktopWindowProps {
   selectedChatId: string | null;
+  isChatDetailsCollapsed: boolean;
 }
 
-export const DesktopWindow = ({ selectedChatId }: DesktopWindowProps) => {
+export const DesktopWindow = ({
+  selectedChatId,
+  isChatDetailsCollapsed,
+}: DesktopWindowProps) => {
   const currentChatUser = users.find((u) => u.id === selectedChatId);
   const currentUser = users[5]; // Harry Fettel is the current user for dark mode example
 
@@ -52,13 +57,13 @@ export const DesktopWindow = ({ selectedChatId }: DesktopWindowProps) => {
             <DesktopMessage
               key={message.id}
               message={message}
-              isCurrentUser={message.senderId === currentUser.id}
+              isCurrentUser={message.senderId === currentUser?.id}
             />
           ))}
         </div>
       </ScrollArea>
 
-      <div className="p-6">
+      <div className={cn("py-6 px-20", { " px-40": isChatDetailsCollapsed })}>
         <DesktopChatInput />
       </div>
     </div>

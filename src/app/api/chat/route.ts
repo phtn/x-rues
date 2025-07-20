@@ -104,7 +104,7 @@ export async function POST(request: Request) {
 
     case "JOIN_ROOM":
       const roomIndex = rooms.findIndex((r) => r.id === data.roomId);
-      if (roomIndex !== -1) {
+      if (roomIndex !== -1 && rooms[roomIndex]) {
         const existingMember = rooms[roomIndex].members.find(
           (m) => m.id === data.user.id,
         );
@@ -124,7 +124,7 @@ export async function POST(request: Request) {
 
       const roomToDelete = rooms[roomToDeleteIndex];
       // Check if the user is the creator
-      if (roomToDelete.creatorId !== data.userId) {
+      if (roomToDelete?.creatorId && roomToDelete.creatorId !== data.userId) {
         return NextResponse.json(
           { error: "Only the room creator can delete this room" },
           { status: 403 },

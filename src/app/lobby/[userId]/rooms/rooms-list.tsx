@@ -4,7 +4,6 @@ import { User } from "@/components/chat/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useChatCtx } from "@/ctx/chat-ctx";
-import { useChatRoom } from "@/hooks/use-chatroom";
 import { Icon } from "@/lib/icons";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
@@ -30,15 +29,15 @@ export default function RoomsList({ userId }: RoomsListProps) {
     loadRoomsAndMessages,
   } = useChatCtx();
 
-  const {} = useChatRoom();
+  // const {} = useChatRoom();
 
   // Load rooms when user is authenticated
   useEffect(() => {
     if (currentUser) {
       loadRoomsAndMessages(userId);
       // Poll for updates every 3 seconds
-      const interval = setInterval(loadRoomsAndMessages, 3000);
-      return () => clearInterval(interval);
+      const interval = setInterval(loadRoomsAndMessages, 8000);
+      return clearInterval(interval);
     }
   }, [currentUser, loadRoomsAndMessages, userId]);
 
@@ -108,12 +107,12 @@ export default function RoomsList({ userId }: RoomsListProps) {
               variant="secondary"
               className="shadow-none"
             >
+              Logout
               <Icon
                 solid
                 name="px-chevrons-vertical"
-                className="size-5 mr-1 rotate-90"
+                className="size-4 rotate-90"
               />
-              Logout
             </Button>
           </motion.div>
 
@@ -149,11 +148,11 @@ export default function RoomsList({ userId }: RoomsListProps) {
                       exit={{ opacity: 0, scale: 0.2 }}
                       transition={{
                         type: "spring",
-                        visualDuration: 0.45,
-                        bounce: 0.5,
+                        visualDuration: 0.4,
+                        bounce: 0.45,
                         delay: index * 0.15,
                       }}
-                      className="p-6 md:p-3 md:pb-1 bg-card rounded-lg border hover:shadow-md cursor-pointer group"
+                      className="p-6 md:p-3 md:pb-1 bg-card rounded-lg border dark:border-cyber-border dark:hover:drop-shadow-cyber-blue hover:shadow/5 cursor-pointer group"
                       onClick={handleJoinRoom(room.id)}
                     >
                       <div className="flex justify-between items-start relative">
