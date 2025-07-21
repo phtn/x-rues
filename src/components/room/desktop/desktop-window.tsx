@@ -1,9 +1,11 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DesktopMessage } from "./desktop-message";
-import { DesktopChatInput } from "./desktop-chat-input";
-import { users, desktopChatMessages } from "../data";
+import { CyberAvatar } from "@/components/avatar-gen/gen";
+import { TypingIndicator } from "@/components/e8";
+import { RoundCard } from "@/components/hyper/round-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { desktopChatMessages, users } from "../data";
+import { DesktopChatInput } from "./desktop-chat-input";
+import { DesktopMessage } from "./desktop-message";
 
 interface DesktopWindowProps {
   selectedChatId: string | null;
@@ -29,13 +31,12 @@ export const DesktopWindow = ({
     <div className="flex h-full flex-1 flex-col bg-cyber-panel/50">
       <div className="flex items-center justify-between border-b border-cyber-border p-5">
         <div className="flex items-center gap-4">
-          <Avatar className="h-12 w-12 border-2 border-cyber-border">
-            <AvatarImage
-              src={currentChatUser.avatar ?? "/rues.svg"}
-              alt={currentChatUser.name}
+          <div className="size-12 rounded-lg flex items-center justify-center overflow-hidden">
+            <CyberAvatar
+              publicKey={currentChatUser.name}
+              className="scale-[40%]"
             />
-            <AvatarFallback>{currentChatUser.name.charAt(0)}</AvatarFallback>
-          </Avatar>
+          </div>
           <div className="flex flex-col">
             <h2 className="text-lg tracking-tight font-semibold text-cyber-text-primary/80">
               {currentChatUser.name}
@@ -51,8 +52,22 @@ export const DesktopWindow = ({
         <div className="flex items-center w-12 gap-5 text-cyber-text-secondary"></div>
       </div>
 
+      <div className="flex items-center justify-center h-96 space-x-20">
+        <RoundCard
+          fn={function (id: string): void {
+            console.log(id);
+          }}
+          id={"alice"}
+          name={"Alice"}
+          public_key={"holyshit"}
+          private_key={"holyfuck"}
+        />
+        <div className="size-96 flex items-center justify-center">
+          <TypingIndicator />
+        </div>
+      </div>
       <ScrollArea className="flex-1 p-6 md:min-h-[calc(100vh-180px)]">
-        <div className="flex flex-col gap-5">
+        <div className="hidden flex-col gap-5">
           {desktopChatMessages.map((message) => (
             <DesktopMessage
               key={message.id}

@@ -11,6 +11,7 @@ import {
 } from "react";
 import { DesktopChatList } from "./desktop-chat-list";
 import { DesktopWindow } from "./desktop-window";
+import { cn } from "@/lib/utils";
 // import { DesktopSidebar } from "./desktop-sidebar";
 
 interface Props {
@@ -21,13 +22,13 @@ interface Props {
 const DEFAULT_CHAT_LIST_WIDTH = 384; // w-96 in px
 const DEFAULT_CHAT_DETAILS_WIDTH = 384; // w-96 in px
 const MIN_PANEL_WIDTH = 200; // Minimum width for a panel when not collapsed
-const COLLAPSED_WIDTH = 0; // Width when collapsed
+const COLLAPSED_WIDTH = 2; // Width when collapsed
 
 export const DesktopView = (props: Props) => {
   const { selectedChatId, setSelectedChatId } = props;
 
   const [isChatListCollapsed, setIsChatListCollapsed] = useState(false);
-  const [isChatDetailsCollapsed, setIsChatDetailsCollapsed] = useState(false);
+  const [isChatDetailsCollapsed, setIsChatDetailsCollapsed] = useState(true);
 
   // const [activeDesktopTab, setActiveDesktopTab] = useState("chats");
 
@@ -132,7 +133,10 @@ export const DesktopView = (props: Props) => {
 
       {/* Chat List Panel */}
       <div
-        className="relative flex flex-shrink-0 flex-col bg-origin/5 p-6 transition-all duration-200 ease-in-out"
+        className={cn(
+          "relative flex flex-shrink-0 flex-col bg-origin/5 p-6 transition-all duration-200 ease-in-out",
+          { "p-0": isChatListCollapsed },
+        )}
         style={{
           width: isChatListCollapsed ? COLLAPSED_WIDTH : chatListWidth,
         }}
@@ -184,10 +188,18 @@ export const DesktopView = (props: Props) => {
 
       {/* Resizer Handle 2 */}
       <div
-        className="group/handle origin-center relative hover:drop-shadow-[0_2px_6px_rgba(0,245,255,0.75)] hover:w-2 w-0.5 hover:my-4 rounded-full cursor-ew-resize bg-gradient-to-br from-cyber-border/80 to-cyber-border/60 hover:from-cyan-100 hover:via-orange-200/50 hover:via-70% hover:to-teal-200/70 transition-all duration-300 ease-out"
+        onClick={toggleChatDetailsCollapse}
+        className={cn(
+          "group/handle pointer-events-auto relative rounded-full",
+          "w-1 hover:w-2 transition-all duration-300 ease-out cursor-ew-resize",
+          "bg-gradient-to-br from-cyber-border/80 to-cyber-border/50",
+          "hover:drop-shadow-[0_2px_5px_rgba(0,255,255,0.5)] hover:opacity-60 hover:my-2",
+          " hover:from-cyber-blue/80 hover:via-cyber-blue/80 hover:via-75% hover:to-cyber-blue/50",
+          { "hover:w-1 from-cyber-panel/40": isChatDetailsCollapsed },
+        )}
         onMouseDown={(e) => startResizing(e, "chatDetails")}
       >
-        <div className="absolute inset-y-0 left-1/2 w-2 opacity-20 -translate-x-1/2 bg-cyber-border/60 group-hover:bg-cyber-blue/30" />
+        <div className="absolute inset-y-0 left-1/2 w-2 opacity-20 -translate-x-1/2 bg-cyber-border/60 group-hover:bg-cyber-blue/40" />
       </div>
 
       {/* Chat Details Sidebar */}

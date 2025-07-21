@@ -1,21 +1,19 @@
 "use client";
 
+import { Pin } from "@/components/pin";
+import { useIdentityCtx } from "@/ctx/identity-ctx";
 import { handleAsync } from "@/utils/async-handler";
 import { motion } from "motion/react";
 import { useTheme } from "next-themes";
-
-import { Pin } from "@/components/pin";
-import { useEffect, useRef, useState } from "react";
-import { getCookie, setCookie } from "./actions";
-import { getDeviceProfile } from "@/utils/fingerprint";
-import { type Device } from "./types";
 import Image from "next/image";
+import { useEffect } from "react";
+import { getCookie, setCookie } from "./actions";
 
 interface Props {
   mappedSeq: Record<number, number>;
 }
 export const Content = ({ mappedSeq }: Props) => {
-  const [deviceProfile, setDeviceProfile] = useState<Device>(null);
+  const { getStoredFingerprint, canvasRef } = useIdentityCtx();
   const { setTheme } = useTheme();
 
   useEffect(() => {
@@ -29,28 +27,9 @@ export const Content = ({ mappedSeq }: Props) => {
       .catch(console.error);
   }, [setTheme]);
 
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
   useEffect(() => {
-    const getProfile = async () => {
-      try {
-        if (canvasRef.current) {
-          const profile = await getDeviceProfile(canvasRef.current);
-          setDeviceProfile(profile);
-        }
-      } catch (error) {
-        console.error("Fingerprint Error", error);
-      }
-    };
-
-    getProfile();
-  }, []);
-
-  useEffect(() => {
-    if (deviceProfile) {
-      console.table({ id: deviceProfile.fingerprintId });
-    }
-  }, [deviceProfile]);
+    getStoredFingerprint().catch(console.error);
+  }, [getStoredFingerprint]);
 
   return (
     <div className="flex items-center justify-center">
@@ -60,7 +39,7 @@ export const Content = ({ mappedSeq }: Props) => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="h-32 md:h-56 flex items-center gap-3"
+          className="h-36 md:h-56 flex items-center gap-3"
         >
           <Image
             alt="rues-chat-logo"

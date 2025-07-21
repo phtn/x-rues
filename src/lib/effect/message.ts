@@ -102,12 +102,19 @@ export const validateMessage = (
  * @param message - The message to send
  * @returns An Effect that resolves when the message is sent
  */
-declare type SendMessage = Effect.Effect<
-  never,
-  ValidationError | NetworkError | HttpError | MessageSendError,
-  never
->;
-export const sendMessage = (message: Message): SendMessage => {
+// declare type SendMessage = Effect.Effect<
+//   never,
+//   ValidationError | NetworkError | HttpError | MessageSendError,
+//   never
+// >;
+type MessageErrors =
+  | ValidationError
+  | NetworkError
+  | HttpError
+  | MessageSendError;
+export const sendMessage = (
+  message: Message,
+): Effect.Effect<void, MessageErrors, never> => {
   return pipe(
     // First validate the message
     validateMessage(message),
@@ -127,24 +134,23 @@ export const sendMessage = (message: Message): SendMessage => {
     // Map the response to void
     Effect.map(() => undefined),
 
-    // Handle specific errors
-    // Effect.catchAll((err) => {
-    //   // If it's already a ValidationError, just pass it through
-    //   if (err instanceof ValidationError) {
-    //     return Effect.fail(err) as unknown as ValidationError;
-    //   }
+    Effect.catchAll((err): Effect.Effect<never, MessageErrors, never> => {
+      // If it's already a ValidationError, just pass it through
+      if (err instanceof ValidationError) {
+        return Effect.fail(err);
+      }
 
-    //   // If it's a NetworkError or HttpError, pass it through
-    //   if (err instanceof NetworkError) {
-    //     return Effect.fail(err) as unknown as NetworkError;
-    //   }
+      // If it's a NetworkError or HttpError, pass it through
+      if (err instanceof NetworkError || err instanceof HttpError) {
+        return Effect.fail(err as NetworkError);
+      }
 
-    //   // Otherwise, wrap it in a MessageSendError
-    //   return Effect.fail(
-    //     new MessageSendError(`Failed to send message: ${String(err)}`, err),
-    //   );
-    // }),
-  ) as SendMessage;
+      // Otherwise, wrap it in a MessageSendError
+      return Effect.fail(
+        new MessageSendError(`Failed to send message: ${String(err)}`, err),
+      );
+    }),
+  );
 };
 
 /**

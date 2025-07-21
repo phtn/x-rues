@@ -132,7 +132,7 @@ export const Content = () => {
         </motion.h2>
 
         {/* Avatars Container */}
-        <div className="w-fit flex justify-center items-center md:w-full gap-4 lg:gap-16 relative">
+        <div className="w-fit flex justify-center items-center md:w-full gap-4 lg:gap-20 relative">
           {data.map((user, index) => {
             const isSelected = user.id === selectedAvatar;
             const isLeft = index === 0;

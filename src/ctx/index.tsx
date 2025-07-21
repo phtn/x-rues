@@ -14,6 +14,7 @@ import {
   type ReactNode,
 } from "react";
 import { Toasts } from "./toast";
+import { IdentityCtxProvider } from "./identity-ctx";
 
 interface ProviderProviderProps {
   children: ReactNode;
@@ -55,7 +56,7 @@ const ProviderCtxProvider = ({ children }: ProviderProviderProps) => {
         defaultTheme={defaultMode ?? "system"}
         disableTransitionOnChange
       >
-        {children}
+        <IdentityCtxProvider>{children}</IdentityCtxProvider>
       </ThemeProvider>
 
       <Toasts />

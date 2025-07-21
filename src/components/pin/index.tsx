@@ -1,30 +1,90 @@
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useSFX } from "@/hooks/use-sfx";
 import { motion } from "motion/react";
 import { Button } from "../ui/button";
+import { Effect } from "effect";
+import { useEffectState } from "./use-effect-state";
 
 interface Props {
   mappedSeq: Record<number, number>;
 }
+
+// Define our core types
+type PinState = {
+  seq: number[];
+  pin: boolean;
+};
+
+// Define our Effect-based operations
+const pinOperations = {
+  // Check if the sequence matches the expected pattern
+  checkPin: (
+    seq: number[],
+    sortedValues: number[],
+    mappedEntry: number[],
+  ): boolean => {
+    return Effect.runSync(
+      Effect.sync(() => {
+        if (seq.length !== 4) return false;
+        return seq.length === 4 && matched(sortedValues.slice(), mappedEntry);
+      }),
+    );
+  },
+
+  // Add a number to the sequence if valid
+  addToSequence: (seq: number[], uid: number): number[] => {
+    return Effect.runSync(
+      Effect.sync(() => {
+        if (seq.length >= 4) return [];
+        if (seq.includes(uid)) return seq;
+        return [...seq, uid];
+      }),
+    );
+  },
+
+  // Calculate sorted values from mappedSeq
+  getSortedValues: (mappedSeq: Record<number, number>): number[] => {
+    return Effect.runSync(
+      Effect.sync(() => {
+        const values = Object.entries(mappedSeq);
+        return values.map(([, v]) => v).sort();
+      }),
+    );
+  },
+
+  // Calculate order of a value in sorted array
+  getOrder: (value: number, sortedValues: number[]): number => {
+    return Effect.runSync(
+      Effect.sync(() => sortedValues.findIndex((i) => i === value)),
+    );
+  },
+};
+
 export const Pin = ({ mappedSeq }: Props) => {
-  const [seq, setSeq] = useState<number[]>([]);
+  // Use our custom Effect-based state hook
+  const [state, dispatch] = useEffectState<PinState>({
+    seq: [],
+    pin: false,
+  });
 
   const { sfxDarbuka: sfx } = useSFX({ interrupt: true, volume: 0.15 });
-  const mappedEntry = useMemo(
-    () => seq.map((s) => mappedSeq[s]),
-    [seq, mappedSeq],
+
+  // Calculate derived values using Effect
+  const sortedValues = useMemo(
+    () => pinOperations.getSortedValues(mappedSeq),
+    [mappedSeq],
   );
 
-  const sortedValues = useMemo(() => {
-    const values = Object.entries(mappedSeq);
-    const sorted = values.map(([, v]) => v).sort();
-    return sorted;
-  }, [mappedSeq]);
+  // This is used in the checkPin function via the fx callback
+  const mappedEntry = useMemo(
+    () => state.seq.map((s) => mappedSeq[s] as number),
+    [state.seq, mappedSeq],
+  );
 
   const order = useCallback(
-    (value: number) => sortedValues.findIndex((i) => i === value),
+    (value: number) => pinOperations.getOrder(value, sortedValues),
     [sortedValues],
   );
 
@@ -37,40 +97,46 @@ export const Pin = ({ mappedSeq }: Props) => {
     [order, mappedSeq],
   );
 
-  const getSortedSeq = useCallback(() => {
-    console.table({ sortedValues });
-    console.table({ mappedSeq });
-    setSeq([]);
-  }, [mappedSeq, sortedValues]);
+  // Handle sequence reset
+  // const getSortedSeq = useCallback(() => {
+  //   console.table({ sortedValues });
+  //   console.table({ mappedSeq });
+  //   dispatch({ seq: [] });
+  // }, [mappedSeq, sortedValues, dispatch]);
 
+  // Handle circle click with Effect
   const fx = useCallback(
     (uid: number) => () => {
       const playbackRate = uid * 0.8;
       sfx({ playbackRate });
 
-      setSeq((prev) => {
-        if (prev.length < 4) {
-          if (!prev.includes(uid)) {
-            return [...prev, uid];
-          }
-          return [...prev];
-        }
-        return [];
+      // Update sequence using Effect
+      dispatch({
+        seq: pinOperations.addToSequence(state.seq, uid),
       });
+
+      // Check if pin is correct after update
+      if (state.seq.length === 3 && !state.seq.includes(uid)) {
+        const newSeq = [...state.seq, uid];
+        // Use the new sequence with the updated mappedEntry
+        const newMappedEntry = [...mappedEntry, mappedSeq[uid]] as number[];
+        const isPinCorrect = pinOperations.checkPin(
+          newSeq,
+          sortedValues,
+          newMappedEntry,
+        );
+
+        if (isPinCorrect) {
+          dispatch({ pin: true });
+          console.log("PIN Correct");
+        } else if (newSeq.length === 4) {
+          // Reset sequence if incorrect and length is 4
+          setTimeout(() => dispatch({ seq: [] }), 500);
+        }
+      }
     },
-    [sfx],
+    [sfx, state.seq, sortedValues, mappedSeq, dispatch, mappedEntry],
   );
-
-  const pin = useMemo(() => {
-    const comparison =
-      seq.length === 4 && matched(sortedValues.slice(), mappedEntry);
-    return comparison;
-  }, [seq, sortedValues, mappedEntry]);
-
-  useEffect(() => {
-    if (pin) console.log("PIN Correct");
-    if (seq.length === 4 && !pin) setSeq([]);
-  }, [pin, seq]);
 
   return (
     <div className="">
@@ -82,7 +148,7 @@ export const Pin = ({ mappedSeq }: Props) => {
                 <motion.div
                   onClick={fx(circle.uid)}
                   key={circle.id}
-                  className={`absolute size-16 border-none rounded-full p-1 aspect-square flex items-center justify-center  ${circle.pos} ${seq.includes(circle.uid) && !pin ? "pointer-events-none bg-sky-500 text-white" : "pointer-events-auto"} ${pin && "bg-emerald-400 pointer-events-none text-white"}`}
+                  className={`absolute size-16 border-none rounded-full p-1 aspect-square flex items-center justify-center  ${circle.pos} ${state.seq.includes(circle.uid) && !state.pin ? "pointer-events-none bg-sky-500 text-white" : "pointer-events-auto"} ${state.pin && "bg-emerald-400 font-bold pointer-events-none text-white"}`}
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{
                     scale: 1,
@@ -94,16 +160,16 @@ export const Pin = ({ mappedSeq }: Props) => {
                       visualDuration: 0.4,
                       bounce: 0.6,
                     },
-                    delay: 1 + idx * 0.3,
+                    delay: idx * 0.3,
                   }}
                   whileTap={{ scale: 0.8 }}
                 >
                   <div
-                    className={`size-14 flex items-center justify-center aspect-square rounded-full ${pin ? "bg-transparent" : "bg-neutral-200/30"}`}
+                    className={`size-14 flex items-center justify-center aspect-square rounded-full ${state.pin ? "bg-transparent" : "bg-neutral-200/30"}`}
                   >
                     <span
                       className={cn(
-                        "text-xl select-none font-space drop-shadow-xs hidden",
+                        "text-xl select-none font-space drop-shadow-sm hidden",
                         { flex: circle.value },
                       )}
                     >
@@ -126,10 +192,8 @@ export const Pin = ({ mappedSeq }: Props) => {
       </div>
 
       {/* Navigation Link */}
-      <ToLobby pin={pin} />
-      <div className="h-40 w-full justify-center flex items-center">
-        <Button onClick={getSortedSeq}>Get Sorted Sequence</Button>
-      </div>
+      <ToLobby pin={state.pin} />
+      <div className="h-40 w-full justify-center flex items-center"></div>
     </div>
   );
 };
@@ -144,30 +208,29 @@ const ToLobby = ({ pin }: { pin: boolean }) => (
       bounce: 0.6,
       delay: 0.8,
     }}
-    className="h-24 flex items-center"
+    className="h-40 flex items-center justify-center"
   >
     {pin ? (
       <Link href={pin ? "/lobby" : "#"}>
-        <div className="group flex items-center gap-2 text-neutral-500 hover:text-neutral-700 transition-colors">
-          <span className="font-sans text-sm">
-            <span className=" tracking-tight">to</span>{" "}
-            <span className="text-neutral-700 font-mono font-medium">
-              Lobby
+        <Button variant="secondary" size="lg" asChild>
+          {/* <div className="group flex items-center gap-2 text-neutral-500 hover:text-neutral-700 transition-colors"> */}
+          <div className="font-sans">
+            <span className="text-cyan-100 font-medium flex items-center space-x-4 drop-shadow-[0_0_4px_rgba(0,250,255,0.4)]">
+              <span>Lobby</span>
+              <motion.span
+                className={cn("text-lg hidden", { flex: pin })}
+                animate={{ x: [0, 4, 0] }}
+                transition={{
+                  duration: 1.6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                →
+              </motion.span>
             </span>
-          </span>
-
-          <motion.span
-            className={cn("text-lg -mb-1 hidden", { flex: pin })}
-            animate={{ x: [0, 4, 0] }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          >
-            →
-          </motion.span>
-        </div>
+          </div>
+        </Button>
       </Link>
     ) : (
       <span className="font-sans text-cyber-text-primary select-none">

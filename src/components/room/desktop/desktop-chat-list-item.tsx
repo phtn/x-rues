@@ -1,5 +1,6 @@
 "use client";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { CyberAvatar } from "@/components/avatar-gen/gen";
+import { TypingIndicator } from "@/components/e8";
 import { Icon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 
@@ -32,19 +33,18 @@ export function DesktopChatListItem({
           : "hover:bg-cyber-panel hover:border-cyber-border",
       )}
     >
-      <Avatar className="size-12 aspect-square dark:bg-origin border-origin">
-        <AvatarImage src={chat.avatar ?? "/rues.svg"} alt={chat.name} />
-        <AvatarFallback className="bg-transparent">
-          <span className=" font-bold font-sans text-xl text-cyber-text-primary">
-            {chat.name.charAt(0)}
-          </span>
-        </AvatarFallback>
-      </Avatar>
+      <div className="size-12 rounded-lg flex items-center justify-center overflow-hidden">
+        <CyberAvatar publicKey={chat.name} className="scale-[40%]" />
+      </div>
       <div className="flex-1">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-lg text-cyber-text-primary">
-            {chat.name}
-          </h3>
+          <div className="flex items-center space-x-3">
+            <h3 className="font-semibold text-lg text-cyber-text-primary">
+              {chat.name}
+            </h3>
+            {/* <span>{chat.id}</span> */}
+            {chat.id === "c1" && <TypingIndicator />}
+          </div>
           <span className="text-xs text-cyber-text-secondary">{chat.time}</span>
         </div>
         <div className="flex items-center justify-between text-sm text-cyber-text-secondary">

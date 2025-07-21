@@ -1,5 +1,6 @@
 "use server";
 
+import { Identity } from "@semaphore-protocol/identity";
 import { cookies } from "next/headers";
 
 interface CookieOptions {
@@ -10,13 +11,21 @@ interface CookieOptions {
   maxAge?: number;
 }
 
-type CookieType = "theme" | "darkMode" | "soundEnabled" | "userId";
+type CookieType =
+  | "theme"
+  | "darkMode"
+  | "soundEnabled"
+  | "userId"
+  | "fingerprint"
+  | "identity";
 
 type ValuesMap = {
   theme: string;
   soundEnabled: boolean;
   darkMode: boolean;
   userId: string;
+  fingerprint: string;
+  identity: Identity;
 };
 
 interface Expiry {
@@ -28,6 +37,8 @@ const cookieNameMap: Record<CookieType, string> = {
   darkMode: "dark-mode-enabled",
   soundEnabled: "sound-enabled",
   userId: "eph-user-id",
+  fingerprint: "rues-fingerprint",
+  identity: "rues-identity",
 };
 
 const defaults: CookieOptions = {
